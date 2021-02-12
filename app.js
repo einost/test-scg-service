@@ -1,14 +1,17 @@
 const Hapi = require('@hapi/hapi')
 const Config = require('./src/config')
+const Constants = require('./src/constants')
 
 const server = new Hapi.Server(Config.server.connection)
 
 const init = async () => {
   await server.register(Config.server.registers)
   await server.start()
+  const { db } = Config
+  await db.connect(Constants.DB_URL)
 
   server.auth.strategy('jwt', 'jwt', {
-    key: process.env.SECRET_KEY,
+    key: Constants.SECRET_KEY,
     validate: async (decoded, request, h) => {
       const { vendingMachineId } = decoded
       if (!vendingMachineId) {

@@ -1,11 +1,13 @@
 const routes = require('../routes')
 const hapiAuth = require('hapi-auth-jwt2')
 const inert = require('@hapi/inert')
+const mongoose = require('mongoose')
+const Constants = require('./constants')
 
 const server = {
   connection: {
-    host: process.env.HOST || 'localhost',
-    port: process.env.PORT || 7000,
+    host: Constants.HOST || 'localhost',
+    port: Constants.PORT || 7000,
     routes: {
       cors: {
         origin: ['*'],
@@ -36,6 +38,31 @@ const server = {
   ]
 }
 
+const db = {
+  connect: async (dbAddress) => {
+    try {
+      await mongoose.connect(dbAddress, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useFindAndModify: false,
+        useCreateIndex: true
+      })
+      console.log(`DB connected on ${dbAddress}`)
+    } catch (error) {
+      console.log(error)
+    }
+  },
+  close: async () => {
+    try {
+      await mongoose.connection.close()
+      console.log(`DB disconnected`)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+}
+
 module.exports = {
-  server
+  server,
+  db
 }
