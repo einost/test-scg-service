@@ -1,9 +1,19 @@
-var express = require('express');
-var router = express.Router();
+const glob = require('glob')
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
+exports.plugin = {
+  name: 'routers',
+  version: '1.0.0',
+  register: (server) => {
+    const files = glob.sync('./src/api/*.route.js', {
+      absolute: true
+    })
 
-module.exports = router;
+    console.log('Path the following...')
+    files.map((file) => {
+      console.log('file', file)
+      const routes = require(file)
+      routes.forEach((route) => console.log(route.method + ' ' + route.path))
+      server.route(routes)
+    })
+  }
+}

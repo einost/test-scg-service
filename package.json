@@ -3,13 +3,20 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node app.js"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "express": "~4.16.1",
+    "glob": "^7.1.6",
+    "hapi-auth-jwt2": "^10.2.0",
+    "@hapi/boom": "^9.1.1",
+    "hapi-geo-locate": "^4.1.1",
+    "@hapi/hapi": "^20.1.0",
+    "@hapi/inert": "^6.0.3",
     "http-errors": "~1.6.3",
+    "joi": "^17.4.0",
     "morgan": "~1.9.1",
     "pug": "2.0.0-beta11"
   }
