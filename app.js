@@ -1,4 +1,5 @@
 const Hapi = require('@hapi/hapi')
+const { Utils } = require('test-scg-sdk')
 const Config = require('./src/config')
 const Constants = require('./src/constants')
 
@@ -10,6 +11,9 @@ const init = async () => {
   const { db } = Config
   await db.connect(Constants.DB_URL)
 
+  server.events.on('response', request => {
+    Utils.Logger.eventLog(request)
+  })
   server.auth.strategy('jwt', 'jwt', {
     key: Constants.SECRET_KEY,
     validate: async (decoded, request, h) => {

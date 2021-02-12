@@ -9,16 +9,17 @@
     "@hapi/boom": "^9.1.1",
     "@hapi/hapi": "^20.1.0",
     "@hapi/inert": "^6.0.3",
+    "@hapi/vision": "^6.0.1",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "express": "~4.16.1",
     "glob": "^7.1.6",
     "hapi-auth-jwt2": "^10.2.0",
-    "hapi-geo-locate": "^4.1.1",
     "http-errors": "~1.6.3",
     "joi": "^17.4.0",
+    "moment": "^2.29.1",
     "mongoose": "^5.11.15",
     "morgan": "~1.9.1",
-    "pug": "2.0.0-beta11"
+    "test-scg-sdk": "git+https://github.com/einost/test-scg-sdk.git#develop"
   }
 }

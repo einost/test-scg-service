@@ -1,6 +1,7 @@
 const routes = require('../routes')
 const hapiAuth = require('hapi-auth-jwt2')
 const inert = require('@hapi/inert')
+const vision = require('@hapi/vision')
 const mongoose = require('mongoose')
 const Constants = require('./constants')
 
@@ -29,12 +30,7 @@ const server = {
     routes,
     hapiAuth,
     inert,
-    {
-      plugin: require('hapi-geo-locate'),
-      options: {
-        enabledByDefault: true
-      }
-    }
+    vision
   ]
 }
 

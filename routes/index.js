@@ -7,8 +7,6 @@ exports.plugin = {
     const files = glob.sync('./src/api/*.route.js', {
       absolute: true
     })
-
-    console.log('Path the following...')
     files.map((file) => {
       console.log('file', file)
       const routes = require(file)
