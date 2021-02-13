@@ -15,6 +15,11 @@ const routes = [
   //   method: 'POST',
   //   path: '/api/vending-machine/auto-create',
   //   config: Controller.autoCreateVendingMachine
+  // },
+  // {
+  //   method: 'POST',
+  //   path: '/api/product/auto-create',
+  //   config: Controller.autoCreateProduct
   // }
 ]
 
