@@ -34,7 +34,7 @@ const server = {
   ]
 }
 
-const db = {
+const database = {
   connect: async (dbAddress) => {
     try {
       await mongoose.connect(dbAddress, {
@@ -60,5 +60,5 @@ const db = {
 
 module.exports = {
   server,
-  db
+  database
 }

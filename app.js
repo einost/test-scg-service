@@ -8,8 +8,7 @@ const server = new Hapi.Server(Config.server.connection)
 const init = async () => {
   await server.register(Config.server.registers)
   await server.start()
-  const { db } = Config
-  await db.connect(Constants.DB_URL)
+  await Config.database.connect(Constants.DB_URL)
 
   server.events.on('response', request => {
     Utils.Logger.eventLog(request)

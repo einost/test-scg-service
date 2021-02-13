@@ -1,5 +1,22 @@
+const _ = require('underscore')
 const Boom = require('@hapi/boom')
-const { DB } = require('test-scg-sdk')
+const bcrypt = require('bcrypt')
+const {
+  Constants: {
+    AdminRole,
+    VendingMachineStatus
+  },
+  DB: {
+    Admin,
+    VendingMachine,
+    Product,
+    Stock
+  },
+  Utils: {
+    Email
+  }
+} = require('test-scg-sdk')
+const Constants = require('../constants')
 const Validation = require('./api.validation')
 
 const getVendingMachineList = {
@@ -11,7 +28,7 @@ const getVendingMachineList = {
         page,
         limit
       } = request.query
-      const vendingMachineList = await DB.VendingMachine.getList({}, page, limit)
+      const vendingMachineList = await VendingMachine.getList({}, page, limit)
       return {
         statusCode: 200,
         data: vendingMachineList
@@ -33,11 +50,11 @@ const vendingMachinePayment = {
         vendingMachineId,
         productId
       } = request.payload
-      const vendingMachine = await DB.VendingMachine.findById(vendingMachineId)
+      let vendingMachine = await VendingMachine.findById(vendingMachineId)
       if (!vendingMachine) {
         return Boom.notFound(`Not found vending machine by ${vendingMachineId}`)
       }
-      const product = await DB.Product.findById(productId)
+      const product = await Product.findById(productId)
       if (!product) {
         return Boom.notFound(`Not found vending machine by ${productId}`)
       }
@@ -49,17 +66,59 @@ const vendingMachinePayment = {
        * ...do something
        * 
        */
-      let stock = await DB.Stock.findOne({
+      let stock = await Stock.findOne({
         vendingMachineId,
         productId
       })
       if (stock) {
-        stock = await DB.Stock.update(stock._id, { quantity: stock.quantity - 1 }) 
+        stock = await Stock.update(stock._id, { quantity: stock.quantity - 1 })
       }
-      const stockList = await DB.stock.find({ _id: stock._id })
+      const stockList = await Stock.find({ vendingMachineId })
+      let allQuantity = 0
+      stockList.map(item => {
+        allQuantity += item.quantity || 0
+      })
+      // allQuantity = 9 // for dev
+      let mailUrl
+      if (allQuantity < 10) {
+        vendingMachine = await VendingMachine.update(vendingMachineId, { statusId: VendingMachineStatus.NEAR_OFFLINE })
+        const admin = await Admin.find({
+          role: AdminRole.BRONZE
+        })
+        if (admin.length) {
+          const mailFrom = Constants.MAIL.FROM
+          const mailTo = admin.map(item => item.email)
+          const subject = `สินค้าใกล้จะหมด!!! [รหัสเครื่อง: ${vendingMachineId}]`
+          const html = `
+            <div>
+              <p>เรียนเจ้าหน้าที่ทุกท่าน</p>
+              <p>ขอแจ้งให้ทราบว่าขณะนี้สินค้าจากเครื่องจำหน่ายสินค้าอัตโนมัติใกล้จะหมดแล้ว</p>
+              <div>
+                <p style="margin: 0;"><b>id:</b> ${vendingMachine._id}</p>
+                <p style="margin: 0;"><b>type:</b> ${vendingMachine.machineType}</p>
+                <p style="margin: 0;"><b>quantity:</b> ${allQuantity}</p>
+                <p style="margin: 0;"><b>address:</b> ${vendingMachine.address} ${vendingMachine.subDistrict} ${vendingMachine.district} ${vendingMachine.province} ${vendingMachine.zipCode}</p>
+                <p style="margin: 0;"><b>location:</b> <a href="https://maps.google.com/?q=${vendingMachine.lat},${vendingMachine.lng}" target="_blank">คลิก</p>
+              </div>
+            </div>
+          `
+          mailUrl = await Email.send({
+            from: mailFrom,
+            to: mailTo,
+            subject,
+            html
+          })
+        }
+      }
+      const vendingMachineStatus = _.invert(VendingMachineStatus)[vendingMachine.statusId]
       return {
         statusCode: 200,
-        data: stockList
+        data: {
+          mailUrl,
+          vendingMachineStatus: vendingMachineStatus,
+          quantity: allQuantity,
+          message: 'Success'
+        }
       }
     } catch (error) {
       console.log(error)
@@ -87,14 +146,15 @@ const autoCreateVendingMachine = {
           machineType: machineType[0],
           lat: (Math.random() * (12 - 14) + 14).toFixed(7) * 1,
           lng: (Math.random() * (99 - 101) + 101).toFixed(7) * 1,
-          Address: `${Math.floor(Math.random() * (99 - 1)) + 1}/${Math.floor(Math.random() * (99 - 1)) + 1}`,
+          address: `${Math.floor(Math.random() * (99 - 1)) + 1}/${Math.floor(Math.random() * (99 - 1)) + 1}`,
           province: 'กรุงเทพมหานคร',
           district: 'ดอนเมือง',
           subDistrict: 'ดอนเมือง',
           zipCode: '10210'
         }
-        const vendingMachine = await DB.VendingMachine.create(data)
+        const vendingMachine = await VendingMachine.create(data)
         vendingMachineList.push(vendingMachine)
+        i--
       }
       return {
         statusCode: 200,
@@ -150,12 +210,83 @@ const autoCreateProduct = {
           name: item.name,
           price: item.price
         }
-        return await DB.Product.create(data)
+        return await Product.create(data)
       })
       await Promise.all(productList)
       return {
         statusCode: 200,
         data: productList
+      }
+    } catch (error) {
+      console.log(error)
+      return Boom.badImplementation()
+    }
+  }
+}
+
+const createStock = {
+  auth: false,
+  // ...Validation.createStock,
+  handler: async (request) => {
+    try {
+      const { vendingMachineId } = request.payload
+      const productIdList = [
+        '6027a937b016aa04bcb21506',
+        '6027a937b016aa04bcb21507',
+        '6027a937b016aa04bcb21508',
+        '6027a937b016aa04bcb21509',
+        '6027a937b016aa04bcb2150a'
+      ]
+      const stockList = await Promise.all(
+        productIdList.map(async item => {
+          const data = {
+            vendingMachineId,
+            productId: item,
+            quantity: Math.floor(Math.random() * (11 - 5)) + 5
+          }
+          return await Stock.create(data)
+        })
+      )
+      return {
+        statusCode: 200,
+        data: stockList
+      }
+    } catch (error) {
+      console.log(error)
+      return Boom.badImplementation()
+    }
+  }
+}
+
+const createAdmin = {
+  auth: false,
+  // ...Validation.createAdmin,
+  handler: async (request) => {
+    try {
+      const {
+        // email,
+        password,
+        // firstName,
+        // lastName,
+        // role
+      } = request.payload
+      const hashPassword = bcrypt.hashSync(password, 10)
+      await Admin.create({
+        ...request.payload,
+        password: hashPassword
+      })
+      // non_scoobydoo@hotmail.com
+      // 12345678
+      // GOLD 99
+
+      // nonscoobydoo@gmail.com
+      // 12345678
+      // BRONZE 0
+      return {
+        statusCode: 200,
+        data: {
+          message: 'Success'
+        }
       }
     } catch (error) {
       console.log(error)
@@ -171,5 +302,7 @@ module.exports = {
   // ===== for dev =====
   autoCreateVendingMachine,
   autoCreateProduct,
+  createStock,
+  createAdmin
   // ===== for dev =====
 }

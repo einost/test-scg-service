@@ -12,14 +12,19 @@ const routes = [
     config: Controller.vendingMachinePayment
   },
   // {
-  //   method: 'POST',
+  //   method: 'GET',
   //   path: '/api/vending-machine/auto-create',
   //   config: Controller.autoCreateVendingMachine
   // },
   // {
-  //   method: 'POST',
+  //   method: 'GET',
   //   path: '/api/product/auto-create',
   //   config: Controller.autoCreateProduct
+  // },
+  // {
+  //   method: 'POST',
+  //   path: '/api/admin/create',
+  //   config: Controller.createAdmin
   // }
 ]
 

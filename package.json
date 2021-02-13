@@ -10,6 +10,7 @@
     "@hapi/hapi": "^20.1.0",
     "@hapi/inert": "^6.0.3",
     "@hapi/vision": "^6.0.1",
+    "bcrypt": "^5.0.0",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "express": "~4.16.1",
@@ -20,6 +21,7 @@
     "moment": "^2.29.1",
     "mongoose": "^5.11.15",
     "morgan": "~1.9.1",
-    "test-scg-sdk": "git+https://github.com/einost/test-scg-sdk.git#develop"
+    "test-scg-sdk": "git+https://github.com/einost/test-scg-sdk.git#develop",
+    "underscore": "^1.12.0"
   }
 }
