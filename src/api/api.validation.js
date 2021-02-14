@@ -1,5 +1,17 @@
 const Joi = require('joi')
 
+const adminLogin = {
+  validate: {
+    options: {
+      allowUnknown: true
+    },
+    payload: Joi.object({
+      email: Joi.string().email(),
+      password: Joi.string().required()
+    })
+  }
+}
+
 const getVendingMachineList = {
   validate: {
     options: {
@@ -25,6 +37,8 @@ const vendingMachinePayment = {
 }
 
 module.exports = {
+  adminLogin,
+
   getVendingMachineList,
   vendingMachinePayment
 }

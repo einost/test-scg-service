@@ -2,6 +2,16 @@ const Controller = require('./api.controller')
 
 const routes = [
   {
+    method: 'POST',
+    path: '/api/admin/login',
+    config: Controller.adminLogin
+  },
+  {
+    method: 'POST',
+    path: '/api/auth/refresh-token',
+    config: Controller.refreshToken
+  },
+  {
     method: 'GET',
     path: '/api/vending-machine/get-list',
     config: Controller.getVendingMachineList

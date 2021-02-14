@@ -16,7 +16,9 @@
         "HOST": "0.0.0.0",
         "PORT": "8001",
         "DB_URL": "mongodb://localhost:27017/vending_machine_db",
-        "SECRET_KEY": "E!n0sT"
+        "SECRET_KEY": "E!n0sT",
+        "TOKEN_EXPIRE": "15m",
+        "REFRESH_TOKEN_EXPIRE": "30m"
       }
     }
   ]

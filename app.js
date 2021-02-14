@@ -16,8 +16,11 @@ const init = async () => {
   server.auth.strategy('jwt', 'jwt', {
     key: Constants.SECRET_KEY,
     validate: async (decoded, request, h) => {
-      const { vendingMachineId } = decoded
-      if (!vendingMachineId) {
+      const {
+        vendingMachineId,
+        email
+      } = decoded
+      if (!vendingMachineId && !email) {
         return { isValid: false }
       } else {
         return { isValid: true }

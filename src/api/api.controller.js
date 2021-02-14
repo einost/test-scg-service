@@ -1,6 +1,7 @@
 const _ = require('underscore')
 const Boom = require('@hapi/boom')
 const bcrypt = require('bcrypt')
+const JWT = require('jsonwebtoken')
 const {
   Constants: {
     AdminRole,
@@ -18,6 +19,68 @@ const {
 } = require('test-scg-sdk')
 const Constants = require('../constants')
 const Validation = require('./api.validation')
+
+const adminLogin = {
+  auth: false,
+  ...Validation.login,
+  handler: async (request, h) => {
+    try {
+      const {
+        email,
+        password
+      } = request.payload
+      const admin = await Admin.findOne({ email })
+      if (!admin) {
+        return Boom.badRequest('user not exists')
+      }
+      const isMatch = bcrypt.compareSync(password, admin.password)
+      if (!isMatch) {
+        return Boom.unauthorized('invalid password')
+      }
+      const testScgToken = JWT.sign({ email }, Constants.SECRET_KEY, { expiresIn: Constants.TOKEN_EXPIRE })
+      const testScgRefreshToken = JWT.sign({ email }, Constants.SECRET_KEY, { expiresIn: Constants.REFRESH_TOKEN_EXPIRE })
+      return {
+        statusCode: 200,
+        data: {
+          testScgToken,
+          testScgRefreshToken
+        }
+      }
+    } catch (error) {
+      console.log(error)
+      return Boom.badImplementation()
+    }
+  }
+}
+
+const refreshToken = {
+  auth: false,
+  handler: async (request, h) => {
+    try {
+      const { authorization } = request.headers
+      const decoded = JWT.verify(authorization, Constants.SECRET_KEY)
+      const { 
+        vendingMachineId, 
+        email
+      } = decoded
+      if (vendingMachineId || email) {
+        const testScgToken = JWT.sign({ email }, Constants.SECRET_KEY, { expiresIn: Constants.TOKEN_EXPIRE })
+        const testScgRefreshToken = JWT.sign({ email }, Constants.SECRET_KEY, { expiresIn: Constants.REFRESH_TOKEN_EXPIRE })
+        return {
+          statusCode: 200,
+          data: {
+            testScgToken,
+            testScgRefreshToken
+          }
+        }
+      }
+      return Boom.unauthorized()
+    } catch (error) {
+      console.log(error)
+      return Boom.unauthorized(error)
+    }
+  }
+}
 
 const getVendingMachineList = {
   auth: false, // for dev
@@ -296,6 +359,9 @@ const createAdmin = {
 }
 
 module.exports = {
+  adminLogin,
+  refreshToken,
+
   getVendingMachineList,
   vendingMachinePayment,
 
