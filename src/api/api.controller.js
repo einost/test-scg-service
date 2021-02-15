@@ -35,7 +35,7 @@ const adminLogin = {
       }
       const isMatch = bcrypt.compareSync(password, admin.password)
       if (!isMatch) {
-        return Boom.unauthorized('invalid password')
+        return Boom.badRequest('invalid password')
       }
       const testScgToken = JWT.sign({ email }, Constants.SECRET_KEY, { expiresIn: Constants.TOKEN_EXPIRE })
       const testScgRefreshToken = JWT.sign({ email }, Constants.SECRET_KEY, { expiresIn: Constants.REFRESH_TOKEN_EXPIRE })
@@ -83,7 +83,6 @@ const refreshToken = {
 }
 
 const getVendingMachineList = {
-  auth: false, // for dev
   ...Validation.getVendingMachineList,
   handler: async (request) => {
     try {
@@ -104,15 +103,11 @@ const getVendingMachineList = {
 }
 
 const vendingMachinePayment = {
-  auth: false, // for dev
   ...Validation.vendingMachinePayment,
   handler: async (request) => {
     try {
-      // const { vendingMachineId } = request.auth.credentials
-      const {
-        vendingMachineId,
-        productId
-      } = request.payload
+      const { vendingMachineId } = request.auth.credentials
+      const { productId } = request.payload
       let vendingMachine = await VendingMachine.findById(vendingMachineId)
       if (!vendingMachine) {
         return Boom.notFound(`Not found vending machine by ${vendingMachineId}`)
@@ -288,7 +283,7 @@ const autoCreateProduct = {
 }
 
 const createStock = {
-  auth: false,
+  auth: false, // for dev
   // ...Validation.createStock,
   handler: async (request) => {
     try {

@@ -30,7 +30,6 @@ const vendingMachinePayment = {
       allowUnknown: true
     },
     payload: Joi.object({
-      vendingMachineId: Joi.string().required(),
       productId: Joi.string().required()
     })
   }
