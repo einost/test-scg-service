@@ -8,7 +8,7 @@ const Constants = require('./constants')
 const server = {
   connection: {
     host: Constants.HOST || 'localhost',
-    port: Constants.PORT || 7000,
+    port: Constants.PORT || 8001,
     routes: {
       cors: {
         origin: ['*'],
