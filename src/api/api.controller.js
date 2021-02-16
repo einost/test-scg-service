@@ -82,8 +82,8 @@ const refreshToken = {
   }
 }
 
-const getVendingMachineList = {
-  ...Validation.getVendingMachineList,
+const getStockList = {
+  ...Validation.getStockList,
   handler: async (request) => {
     try {
       const {

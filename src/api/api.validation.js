@@ -24,6 +24,17 @@ const getVendingMachineList = {
   }
 }
 
+const getStockList = {
+  validate: {
+    options: {
+      allowUnknown: true
+    },
+    payload: Joi.object({
+      vendingMachineId: Joi.string().required()
+    })
+  }
+}
+
 const vendingMachinePayment = {
   validate: {
     options: {
@@ -37,7 +48,7 @@ const vendingMachinePayment = {
 
 module.exports = {
   adminLogin,
-
   getVendingMachineList,
+  getStockList,
   vendingMachinePayment
 }

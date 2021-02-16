@@ -12,14 +12,19 @@ const routes = [
     config: Controller.refreshToken
   },
   {
+    method: 'POST',
+    path: '/api/vending-machine/payment',
+    config: Controller.vendingMachinePayment
+  },
+  {
     method: 'GET',
     path: '/api/vending-machine/get-list',
     config: Controller.getVendingMachineList
   },
   {
-    method: 'POST',
-    path: '/api/vending-machine/payment',
-    config: Controller.vendingMachinePayment
+    method: 'GET',
+    path: '/api/vending-machine/get-stock-list',
+    config: Controller.getStockList
   },
   // {
   //   method: 'GET',
