@@ -1,4 +1,4 @@
-const routes = require('../routes')
+const routes = require('./routes')
 const hapiAuth = require('hapi-auth-jwt2')
 const inert = require('@hapi/inert')
 const vision = require('@hapi/vision')

@@ -8,7 +8,6 @@ exports.plugin = {
       absolute: true
     })
     files.map((file) => {
-      console.log('file', file)
       const routes = require(file)
       routes.forEach((route) => console.log(route.method + ' ' + route.path))
       server.route(routes)

@@ -2,7 +2,7 @@
   "apps": [
     {
       "name": "test-scg-service",
-      "script": "app.js",
+      "script": "index.js",
       "exec_mode": "fork",
       "watch": true,
       "instances": 1,
