@@ -82,8 +82,8 @@ const refreshToken = {
   }
 }
 
-const getStockList = {
-  ...Validation.getStockList,
+const getVendingMachineList = {
+  ...Validation.getVendingMachineList,
   handler: async (request) => {
     try {
       const {
@@ -102,6 +102,33 @@ const getStockList = {
   }
 }
 
+const getStockList = {
+  ...Validation.getStockList,
+  handler: async (request) => {
+    try {
+      const { vendingMachineId } = request.payload
+      const stockList = await Stock.find({ vendingMachineId })
+      if (stockList.length === 0) {
+        return Boom.notFound(`not found stock of vending machine by ${vendingMachineId}`)
+      }
+      let allQuantity = 0
+      stockList.map(item => {
+        allQuantity += item.quantity || 0
+      })
+      return {
+        statusCode: 200,
+        data: {
+          stockList,
+          quantity: allQuantity
+        }
+      }
+    } catch (error) {
+      console.log(error)
+      return Boom.badImplementation()
+    }
+  }
+}
+
 const vendingMachinePayment = {
   ...Validation.vendingMachinePayment,
   handler: async (request) => {
@@ -110,11 +137,11 @@ const vendingMachinePayment = {
       const { productId } = request.payload
       let vendingMachine = await VendingMachine.findById(vendingMachineId)
       if (!vendingMachine) {
-        return Boom.notFound(`Not found vending machine by ${vendingMachineId}`)
+        return Boom.notFound(`not found vending machine by ${vendingMachineId}`)
       }
       const product = await Product.findById(productId)
       if (!product) {
-        return Boom.notFound(`Not found vending machine by ${productId}`)
+        return Boom.notFound(`not found vending machine by ${productId}`)
       }
       /** 
        * ====================================
@@ -358,6 +385,7 @@ module.exports = {
   refreshToken,
 
   getVendingMachineList,
+  getStockList,
   vendingMachinePayment,
 
   // ===== for dev =====

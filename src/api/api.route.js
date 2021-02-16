@@ -22,7 +22,7 @@ const routes = [
     config: Controller.getVendingMachineList
   },
   {
-    method: 'GET',
+    method: 'POST',
     path: '/api/vending-machine/get-stock-list',
     config: Controller.getStockList
   },
