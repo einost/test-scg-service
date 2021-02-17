@@ -147,11 +147,15 @@ const vendingMachinePayment = {
         vendingMachineId,
         productId
       })
+      let stock = await Stock.findOne({
+        vendingMachineId,
+        productId
+      })
       if (stock) {
-        stock = await Stock.update(stock._id, { quantity: stock.quantity - 1 })
         if (stock.quantity <= 0) {
           return Boom.badData('product out of stock')
         }
+        stock = await Stock.update(stock._id, { quantity: stock.quantity - 1 })
         /** 
         * ====================================
         * ========== Payement Logic ==========
