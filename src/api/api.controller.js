@@ -143,20 +143,23 @@ const vendingMachinePayment = {
       if (!product) {
         return Boom.notFound(`not found vending machine by ${productId}`)
       }
-      /** 
-       * ====================================
-       * ========== Payement Logic ==========
-       * ====================================
-       * 
-       * ...do something
-       * 
-       */
       let stock = await Stock.findOne({
         vendingMachineId,
         productId
       })
       if (stock) {
         stock = await Stock.update(stock._id, { quantity: stock.quantity - 1 })
+        if (stock.quantity <= 0) {
+          return Boom.badData('product out of stock')
+        }
+        /** 
+        * ====================================
+        * ========== Payement Logic ==========
+        * ====================================
+        * 
+        * ...do something
+        * 
+        */
       }
       const stockList = await Stock.find({ vendingMachineId })
       let allQuantity = 0
